@@ -51,6 +51,7 @@ var FilterRaw = []bpf.RawInstruction{
 func checkEr(err error) {
 	if err != nil {
 		log.Fatal(err)
+		fmt.Println("[-] ERROR:",err)
 	}
 }
 

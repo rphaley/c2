@@ -409,7 +409,7 @@ func execCommand(command string) {
 		fmt.Println("[+] COMMAND:", command)
 
 		// Run the command and get output
-		_, err := exec.Command("/bin/sh", "-c", command).CombinedOutput()
+		out, err := exec.Command("/bin/sh", "-c", command).CombinedOutput()
 		if err != nil {
 			fmt.Println("\n[-] ERROR:", err)
 		}

@@ -369,7 +369,7 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 		addr := CreateAddrStruct(iface)
 
 		SendPacket(fd, iface, addr, packet)
-		fmt.Println("[+] Sent HELLO")
+		fmt.Println("[+] Sent HELLO to:", dst)
 		// Send hello every 5 seconds
 		time.Sleep(5 * time.Second)
 	}

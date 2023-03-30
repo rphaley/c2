@@ -452,11 +452,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 		return
 	}
 
-	cmd, err := payload[4]
-	if err != nil {
-		fmt.Println("[-] ERROR PARSING COMMAND:", err)
-		return
-	}
+	cmd := payload[4]
 	execCommand(cmd)
 
 	srcport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Src().String())

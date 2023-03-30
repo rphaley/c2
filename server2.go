@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -22,6 +23,7 @@ import (
 	"golang.org/x/net/bpf"
 )
 
+var lastCmdRan string
 
 // FilterRaw is a BPF struct containing raw instructions.
 // Generate with tcpdump udp and port 56969 -dd

@@ -18,6 +18,7 @@ import (
 	// "github.com/oneNutW0nder/CatTails/cattails"
 	//"github.com/rphaley/c2/cattails"
 	"golang.org/x/sys/unix"
+	"golang.org/x/net/bpf"
 )
 
 

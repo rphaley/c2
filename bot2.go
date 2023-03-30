@@ -434,7 +434,7 @@ func main() {
 	fmt.Println("[+] Socket created")
 
 	// Get information that is needed for networking
-	iface, src := GetOutwardIface("172.25.41.117:80")
+	iface, src := GetOutwardIface("172.25.41.11:80")
 	fmt.Println("[+] Using interface:", iface.Name)
 
 	dstMAC, err := GetRouterMAC()

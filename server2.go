@@ -546,7 +546,7 @@ func main() {
 
 	// Iface and myip for the sendcommand func to use
 	iface, myIP := GetOutwardIface("172.25.2.11:80")
-	fmt.Println("[+] Bot Server IP:", myIp)
+	fmt.Println("[+] Bot Server IP:", myIP)
 	fmt.Println("[+] Interface:", iface.Name)
 
 	dstMAC, err := GetRouterMAC()

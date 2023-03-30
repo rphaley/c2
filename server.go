@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 	// "github.com/oneNutW0nder/CatTails/cattails"
 	//"github.com/rphaley/c2/cattails"
 	"golang.org/x/sys/unix"

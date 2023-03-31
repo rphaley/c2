@@ -376,11 +376,11 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 		
 		packet := CreatePacket(iface, src, dst, 47135, 3389, dstMAC, CreateHello(iface.HardwareAddr, src))
 		
-		fmt.Println("[+] packet:", packet)
+		fmt.Println("[+] packet:", string(packet))
 
 		addr := CreateAddrStruct(iface)
 		
-		fmt.Println("[+] packet:", addr)
+		fmt.Println("[+] addr:", addr)
 
 		SendPacket(fd, iface, addr, packet)
 		fmt.Println("[+] Sent HELLO to:", dst)

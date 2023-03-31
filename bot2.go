@@ -352,10 +352,49 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 		log.Fatal("Hostname not found...")
 	}
 	
-	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + os.Args[2] 
+	//Encrypt Command
+	plaintext := []byte(os.Args[2])
+	key := []byte("pooppeepee")
+	ciphertext, err := encrypt(plaintext, key)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Encrypted: %x\n", ciphertext)
+	
+	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + ciphertext
 	fmt.Println("[+] Payload Created:", hello)
 
 	return hello
+}
+
+func encrypt(plaintext []byte, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	// Generate a random initialization vector (IV)
+	iv := make([]byte, aes.BlockSize)
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return nil, err
+	}
+
+	// Encrypt the plaintext using AES in CBC mode
+	mode := cipher.NewCBCEncrypter(block, iv)
+	padded := pad(plaintext, aes.BlockSize)
+	ciphertext := make([]byte, len(padded))
+	mode.CryptBlocks(ciphertext, padded)
+
+	// Prepend the IV to the ciphertext
+	ciphertext = append(iv, ciphertext...)
+
+	return ciphertext, nil
+}
+
+func pad(data []byte, blockSize int) []byte {
+	padding := blockSize - (len(data) % blockSize)
+	padText := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(data, padText...)
 }
 
 

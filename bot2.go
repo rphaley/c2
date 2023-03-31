@@ -358,7 +358,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	
 	//Encrypt Command
 	plaintext := []byte(os.Args[2])
-	key := []byte("pooppeepee")
+	key := []byte("pooppooppooppoop")
 	ciphertext, err := encrypt(plaintext, key)
 	if err != nil {
 		panic(err)

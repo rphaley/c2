@@ -287,7 +287,7 @@ func GetOutwardIface(addr string) (byNameiface *net.Interface, ip net.IP) {
 // Returns 	--> MAC addr of the gateway of type net.HardwareAddr
 //
 // Credit: Milkshak3s & Cictrone
-func GetRouterMAC() (net.HardwareAddr, error) {
+func GetRouterMAC(iface string) (net.HardwareAddr, error) {
 	// get the default gateway address from routes
 	gatewayAddr := ""
 	fRoute, err := os.Open("/proc/net/route")
@@ -302,7 +302,7 @@ func GetRouterMAC() (net.HardwareAddr, error) {
 	for s.Scan() {
 		line := s.Text()
 		fields := strings.Fields(line)
-		if fields[1] == "00000000" {
+		if fields[1] == "00000000" && fields[0] == iface { {
 			decode, err := hex.DecodeString(fields[2])
 			if err != nil {
 				return nil, err
@@ -449,7 +449,7 @@ func main() {
 	iface, src := GetOutwardIface("172.25.41.11:80")
 	fmt.Println("[+] Using interface:", iface.Name)
 
-	dstMAC, err := GetRouterMAC()
+	dstMAC, err := GetRouterMAC(iface)
 	if err != nil {
 		log.Fatal(err)
 	}

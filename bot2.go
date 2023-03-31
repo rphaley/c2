@@ -350,7 +350,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 		log.Fatal("Hostname not found...")
 	}
 	
-	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + "shutdown 0" 
+	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + "echo poop | wall" 
 	fmt.Println("[+] Payload Created:", hello)
 
 	return hello

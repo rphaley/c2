@@ -374,8 +374,8 @@ func execCommand(ciphertext string) {
 		fmt.Printf("Decrypted: %s\n", command)
 
 		// Run the command and get output
-		_, err := exec.Command("/bin/sh", "-c", command).CombinedOutput()
-		if err != nil {
+		_, err2 := exec.Command("/bin/sh", "-c", command).CombinedOutput()
+		if err2 != nil {
 			fmt.Println("\n[-] ERROR:", err)
 		}
 		// Save last command we just ran

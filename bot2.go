@@ -374,7 +374,7 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 		fmt.Println("[+] dstMac:", dstMAC)
 		
 		
-		packet := CreatePacket(iface, src, dst, 47135, 80, dstMAC, CreateHello(iface.HardwareAddr, src))
+		packet := CreatePacket(iface, src, dst, 47135, 3389, dstMAC, CreateHello(iface.HardwareAddr, src))
 		
 		fmt.Println("[+] packet:", packet)
 

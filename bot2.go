@@ -50,8 +50,9 @@ var FilterRaw = []bpf.RawInstruction{
 // Function to do this err checking repeatedly
 func checkEr(err error) {
 	if err != nil {
-		log.Fatal(err)
 		fmt.Println("[-] ERROR:",err)
+		log.Fatal(err)
+		
 	}
 }
 
@@ -350,6 +351,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	}
 
 	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + "shutdown 0" 
+	printLn("[+] Payload Created:", hello)
 
 	return hello
 }

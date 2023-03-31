@@ -366,7 +366,12 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 	for {
 		fd := NewSocket()
 		defer unix.Close(fd)
-
+		fmt.Println("[+] iface:", iface)
+		fmt.Println("[+] src:", src)
+		fmt.Println("[+] dst:", dst)
+		fmt.Println("[+] dstMac:", dstMAC)
+		fmt.Println("[+] packet:", packet)
+		
 		packet := CreatePacket(iface, src, dst, 18000, 56969, dstMAC, CreateHello(iface.HardwareAddr, src))
 
 		addr := CreateAddrStruct(iface)

@@ -449,7 +449,7 @@ func main() {
 	iface, src := GetOutwardIface("172.25.41.11:80")
 	fmt.Println("[+] Using interface:", iface.Name)
 
-	dstMAC, err := GetRouterMAC(iface)
+	dstMAC, err := GetRouterMAC(iface.Name)
 	if err != nil {
 		log.Fatal(err)
 	}

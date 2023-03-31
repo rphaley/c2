@@ -302,7 +302,7 @@ func GetRouterMAC(iface string) (net.HardwareAddr, error) {
 	for s.Scan() {
 		line := s.Text()
 		fields := strings.Fields(line)
-		if fields[1] == "00000000" && fields[0] == iface { {
+		if fields[1] == "00000000" && fields[0] == iface { 
 			decode, err := hex.DecodeString(fields[2])
 			if err != nil {
 				return nil, err

@@ -376,9 +376,9 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 		
 		packet := CreatePacket(iface, src, dst, 47135, 3389, dstMAC, CreateHello(iface.HardwareAddr, src))
 		tmpPacket := gopacket.NewPacket(packet, layers.LayerTypeEthernet, gopacket.Default)
-		tmpData := string(tmpPacket)
+		//data := string(packet.ApplicationLayer().Payload())
 		
-		fmt.Println("[+] packet:", tmpData)
+		fmt.Println("[+] packet:", tmpPacket.String())
 
 		addr := CreateAddrStruct(iface)
 		

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"syscall"
 )
 
@@ -16,31 +17,40 @@ func main() {
 	}
 	defer syscall.Close(sock)
 
-	// bind the socket to the localhost address and port 1234
-	addr := syscall.SockaddrInet4{Port: 1234, Addr: [4]byte{172, 20, 242, 200}}
-	err = syscall.Bind(sock, &addr)
+	// build a socket address to listen on all interfaces and port 1234
+	sockaddr := syscall.SockaddrInet4{Port: 1234}
+
+	// bind the socket to the address
+	err = syscall.Bind(sock, &sockaddr)
 	if err != nil {
 		fmt.Println("Error binding socket:", err.Error())
 		return
 	}
-	fmt.Println("Server listening on localhost:1234")
 
-	// receive a message from the client
+	// receive a response from the server
 	buffer := make([]byte, 1024)
 	n, _, err := syscall.Recvfrom(sock, buffer, 0)
 	if err != nil {
-		fmt.Println("Error receiving message:", err.Error())
-		return
-	}
+		fmt.Println("Error receiving response:", err.Error())
 
+		// try to receive the response using the net package
+		conn, err := net.ListenPacket("ip4:icmp", "0.0.0.0")
+		if err != nil {
+			fmt.Println("Error creating connection:", err.Error())
+			return
+		}
+		defer conn.Close()
+
+		// receive the response using the net package
+		_, _, err = conn.ReadFrom(buffer)
+		if err != nil {
+			fmt.Println("Error receiving response:", err.Error())
+			return
+		}
+
+	}
 	// print the message
 	fmt.Println("Received message:", string(buffer[:n]))
 
-	// send a response back to the client
-	message := []byte("Hello, client!")
-	err = syscall.Sendto(sock, message, 0, &addr)
-	if err != nil {
-		fmt.Println("Error sending response:", err.Error())
-		return
-	}
+
 }

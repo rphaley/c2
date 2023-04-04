@@ -495,7 +495,7 @@ func main() {
 	
 	//Vaidate parameters
 	if len(os.Args) < 3 {
-        	if debugCheck != "" { fmt.Println("Usage: myprogram <ip address> \"<command>\"") }
+        	fmt.Println("Usage: myprogram <ip address> \"<command>\"") 
        	 	os.Exit(1)
    	 }
 

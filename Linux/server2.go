@@ -585,13 +585,26 @@ func updatepwnBoard(bot Host) {
 }
 
 func main() {
+/*
+	//Vaidate parameters
+	if len(os.Args) < 2 {
+        	fmt.Println("Usage: myprogram <ip address> <debug>") 
+       	 	os.Exit(1)
+   	 }
+   	*/
 
 	// Get passed arguments
 	// 1 = debug (any string)
 		if len(os.Args) > 1 {
-		debugCheck = os.Args[1]
+		debugCheck = os.Args[2]
 	} 
 
+	// Check for valid IP
+	ip := net.ParseIP(os.Args[1])
+	if ip == nil {
+        	if debugCheck != "" { fmt.Println("Invalid IP address:", os.Args[1]) }
+        	os.Exit(1)
+    	}
 
 	// Create a BPF vm for filtering
 	vm := CreateBPFVM(FilterRaw)
@@ -606,7 +619,7 @@ func main() {
 	listen := make(chan Host, 5)
 
 	// Iface and myip for the sendcommand func to use
-	iface, myIP := GetOutwardIface("172.25.2.11:80")
+	iface, myIP := GetOutwardIface("10.30.30.9:80")
 	if debugCheck != "" { fmt.Println("[+] Bot Server IP:", myIP) }
 	if debugCheck != "" { fmt.Println("[+] Interface:", iface.Name) }
 

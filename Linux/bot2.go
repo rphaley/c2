@@ -489,8 +489,7 @@ func execCommand(command string) {
 
 func main() {
 
-	// Get passed arguments
-// 1 = debug (any string)
+
 
 	
 	//Vaidate parameters
@@ -498,7 +497,9 @@ func main() {
         	fmt.Println("Usage: myprogram <ip address> \"<command>\"") 
        	 	os.Exit(1)
    	 }
-
+   	 
+	// Get passed arguments
+	// 1 = debug (any string)
    	 if len(os.Args) >= 3 {
 		debugCheck = os.Args[3]
 	} 

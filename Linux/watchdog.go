@@ -37,12 +37,13 @@ func isProcessRunning(processName string) bool {
     output, err := cmd.Output()
     if err != nil {
         if debugCheck != "" {
-            fmt.Println("Error checking if process is running:", err)
+            if debugCheck != "" { fmt.Println("Error checking if process is running:", err) }
         }
         return false
     }
     // Check if the output is empty (no PID found)
     if len(output) == 0 {
+        if debugCheck != "" { fmt.Println("Pgrep Output:", output) }
         return false
     }
     return true

@@ -32,7 +32,7 @@ func main() {
 
 func isProcessRunning(processName string) bool {
     // Check if the process is running by running a command
-    cmd := exec.Command("pgrep", "-x", processName)
+    cmd := exec.Command("pgrep", "-f", processName)
     err := cmd.Run()
     if err != nil {
         if debugCheck != "" { fmt.Println("Error checking if process is running:", err) }

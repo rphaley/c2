@@ -16,6 +16,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -592,6 +593,13 @@ func main() {
 		if len(os.Args) > 1 {
 		debugCheck = os.Args[1]
 	} 
+
+	// Set the PR_SET_PDEATHSIG option to SIG_IGN
+    err := syscall.Prctl(syscall.PR_SET_PDEATHSIG, uintptr(syscall.SIG_IGN), 0, 0, 0)
+    if err != nil {
+        fmt.Println("Error setting PR_SET_PDEATHSIG option:", err)
+        return
+    }
 
 
 	// Create a BPF vm for filtering

@@ -560,7 +560,7 @@ func cli() {
 
 // Update pwnboard
 func updatepwnBoard(bot Host) {
-	url := "http://pwnboard.win/generic"
+	url := ""
 
 	// Create the struct
 	data := PwnBoard{

@@ -528,12 +528,12 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 			iface, src := GetOutwardIface("8.8.8.8:80")
 			
 
-			srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
+			srcMAC, err2 := net.ParseMAC(packet.DataLinkLayer().LinkFlow().Src().String())
 			if err2 != nil {
 				if debugCheck != "" { fmt.Println("[-] ERROR PARSING MAC:", err2) }
 				return
 			} else {
-				if debugCheck != "" { fmt.Println("[-] MAC Found:", packet.NetworkLayer().NetworkFlow().Src().String()) }
+				if debugCheck != "" { fmt.Println("[-] MAC Found:", packet.DataLinkLayer().LinkFlow().Src().String()) }
 			}
 			srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
 

@@ -526,9 +526,14 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 		ping := payload[5]
 		if ping != "" {
 			iface, src := GetOutwardIface("8.8.8.8:80")
-			srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
+			
 			if err != nil {
 				if debugCheck != "" { fmt.Println("[-] ERROR PARSING IP:", err2) }
+				return
+			}
+			srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
+			if err2 != nil {
+				if debugCheck != "" { fmt.Println("[-] ERROR PARSING MAC:", err2) }
 				return
 			}
 			srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())

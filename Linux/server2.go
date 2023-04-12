@@ -532,8 +532,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 			if err2 != nil {
 				if debugCheck != "" { fmt.Println("[-] ERROR PARSING MAC:", err2) }
 				return
-			}
-			else {
+			} else {
 				if debugCheck != "" { fmt.Println("[-] MAC Found:", packet.NetworkLayer().NetworkFlow().Src().String()) }
 			}
 			srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())

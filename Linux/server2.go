@@ -546,7 +546,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 							if debugCheck != "" { fmt.Println("[+] IP Found:", packet.NetworkLayer().NetworkFlow().Src().String()) }
 						}
 
-						go sendHello(iface, src, srcIP, srcMAC)
+						sendHello(iface, src, srcIP, srcMAC)
 						if debugCheck != "" { fmt.Println("[+] PING SENT MAC(%s) IP(%s):", srcMAC, srcIP) }
 					}
 				}
@@ -592,7 +592,7 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 		tmpPacket := gopacket.NewPacket(packet, layers.LayerTypeEthernet, gopacket.Default)
 		//data := string(packet.ApplicationLayer().Payload())
 		
-		if debugCheck != "" { fmt.Println("[+] packet:", tmpPacket.String()) }
+//		if debugCheck != "" { fmt.Println("[+] packet:", tmpPacket.String()) }
 
 		addr := CreateAddrStruct(iface)
 		

@@ -603,6 +603,8 @@ func main() {
     ips, err := getIPs(os.Args[1])
 	if err == nil {
 		for _, ip := range ips {
+			//remove whitespace from either side
+			cleanIP = strings.TrimSpace(ip)
 			if debugCheck != "" { fmt.Println("[+] IP Parsed: ", ip) }
 
 			// Create BPF filter vm
@@ -616,7 +618,7 @@ func main() {
 
 			// Get information that is needed for networking
 			
-			tmp := os.Args[1]+":80"
+			tmp := cleanIP+":80"
 			iface, src := GetOutwardIface(tmp)
 			fmt.Println("[+] Using interface:", iface.Name)
 
@@ -638,10 +640,9 @@ func main() {
 		    	}
 		*/
 
-			//remove whitespace from either side
-			tmp = strings.TrimSpace(ip)
 
-			ip := net.ParseIP(tmp)
+
+			ip := net.ParseIP(cleanIP)
 			go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
 
 			// Listen for responses

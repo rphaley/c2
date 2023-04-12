@@ -513,6 +513,7 @@ func main() {
    	 
 	// Get passed arguments
 	// 1 = debug (any string)
+	fmt.Println("LEN: ",len(os.Args) ) 
    	 if len(os.Args) >= 3 {
    	 	if os.Args[4] == "1" {
 			debugCheck = os.Args[4]

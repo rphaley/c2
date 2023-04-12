@@ -16,7 +16,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"syscall"
+//	"syscall"
 	"time"
 
 	"github.com/google/gopacket"
@@ -515,8 +515,11 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	ping := payload[5]
 	if ping != "" {
 		iface, src := GetOutwardIface("8.8.8.8:80")
-		srcMAC, err := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
-
+		srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
+		if err != nil {
+			if debugCheck != "" { fmt.Println("[-] ERROR PARSING IP:", err2) }
+			return
+		}
 		srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
 
 		go sendHello(iface, src, srcIP, srcMAC)
@@ -581,7 +584,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	}
 	
 	
-	hello = "PING"
+	hello = "PING:" + hostname
 	if debugCheck != "" { fmt.Println("[+] Payload Created:", hello) }
 
 	return hello

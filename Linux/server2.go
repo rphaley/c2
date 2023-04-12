@@ -523,7 +523,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	//get ping command
 	if len(payload) > 4 {
 		if debugCheck != "" { fmt.Println("Paylod Received:",data) }
-		ping := decryptCommand(payload[5])
+		ping := payload[5]
 		if ping != "" {
 			iface, src := GetOutwardIface("8.8.8.8:80")
 			srcMAC, err2 := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())

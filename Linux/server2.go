@@ -512,7 +512,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 
 	//get ping command
 	ping := payload[5]
-	if ping != nil {
+	if ping != "" {
 		iface, myIP := GetOutwardIface("8.8.8.8:80")
 		go sendHello(iface, src, net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String()), net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String()))
 	}

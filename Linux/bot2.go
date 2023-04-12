@@ -514,7 +514,9 @@ func main() {
 	// Get passed arguments
 	// 1 = debug (any string)
    	 if len(os.Args) >= 4 {
-		debugCheck = os.Args[4]
+   	 	if os.Args[4] == "1" {
+			debugCheck = os.Args[4]
+		}
 	} 
 	
 	// Check for valid IP

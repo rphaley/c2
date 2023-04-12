@@ -414,12 +414,11 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	// Decrypt the ciphertext using AES in CBC mode
 	mode := cipher.NewCBCDecrypter(block, iv)
 	decrypted := make([]byte, len(ciphertext))
-	defer func() {
-		if r := recover(); r != nil {
-	        fmt.Println("Recovered from panic:", r)
-	        return 1, 1
-		}()
-	}
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("recovered from panic:", r)
+        }
+    }()
 
 	mode.CryptBlocks(decrypted, ciphertext)
 

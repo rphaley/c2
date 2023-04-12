@@ -372,7 +372,7 @@ func decryptCommand(ciphertext string) string {
 		tmp2, err := decrypt(tmp, key)
 		command := string(tmp2)
 		if err != nil {
-			panic(err)
+			if debugCheck != "" { fmt.Println("\n[-] ERROR DECRYPTING COMMAND:", err) }
 		}
 		if debugCheck != "" { fmt.Printf("Decrypted: %s\n", command) }
 

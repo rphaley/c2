@@ -379,7 +379,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	if debugCheck != "" { fmt.Printf("Encrypted: %x\n", ciphertext) }
 	hello += "#" + string(ciphertext)
 
-	for i := 3; i < len(os.Args)-1; i++ {
+	for i := 3; i < len(os.Args); i++ {
 		hello += "#" + os.Args[i]
 		if debugCheck != "" { fmt.Printf("Added optional commands: %x\n", os.Args[i]) }
 	}

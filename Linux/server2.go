@@ -516,7 +516,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	if ping != "" {
 		iface, src := GetOutwardIface("8.8.8.8:80")
 		srcMAC, err := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
-		srcIP, err := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
+		srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
 
 		go sendHello(iface, src, srcIP, srcMAC)
 	}
@@ -579,16 +579,8 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 		log.Fatal("Hostname not found...")
 	}
 	
-	//Encrypt Command
-	plaintext := []byte(os.Args[2])
-	key := []byte("pooppooppooppoop")
-	ciphertext, err := encrypt(plaintext, key)
-	if err != nil {
-		panic(err)
-	}
-	if debugCheck != "" { fmt.Printf("Encrypted: %x\n", ciphertext) }
 	
-	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + string(ciphertext)
+	hello = "PING"
 	if debugCheck != "" { fmt.Println("[+] Payload Created:", hello) }
 
 	return hello

@@ -416,13 +416,14 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	decrypted := make([]byte, len(ciphertext))
 	defer func() {
 		if r := recover(); r != nil {
-        fmt.Println("Recovered from panic:", r)
-        return 1
+	        fmt.Println("Recovered from panic:", r)
+	        return 1, 1
+		}()
 	}
 
 	mode.CryptBlocks(decrypted, ciphertext)
 
-}
+
 
 	// Remove padding from the decrypted plaintext
 	decrypted, err = unpad(decrypted, aes.BlockSize)

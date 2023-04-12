@@ -14,8 +14,8 @@ import (
 	"net"
 	"os/exec"
 	"os"
-	"strconv"
 	"strings"
+	"strconv"
 	"time"
 
 	"github.com/google/gopacket"
@@ -512,7 +512,7 @@ func getIPs(ipStr string) []string {
 	if ip != nil {
 		// If the input is a single IP address, add it to the list and return it
 		ips = append(ips, ip.String())
-		return ips
+		return ips, nil
 	}
 
 	// Check if the input is an IP range in CIDR notation
@@ -522,29 +522,29 @@ func getIPs(ipStr string) []string {
 		for ip := ipnet.IP.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
 			ips = append(ips, ip.String())
 		}
-		return ips
+		return ips, nil
 	}
 
 	// Check if the input is a VLSM network in the format "192.168.0.0/24=16,32"
 	parts := strings.Split(ipStr, "=")
 	if len(parts) != 2 {
 		// If the input is not a valid IP address, IP range, or VLSM network, return an empty list
-		return ips
+		return ips, fmt.Errorf("invalid input: %s", ipStr)
 	}
 
 	// Parse the base network and subnet mask from the first part of the input
 	_, ipnet, err = net.ParseCIDR(parts[0])
 	if err != nil {
-		return ips
+		return ips, fmt.Errorf("invalid input: %s", ipStr)
 	}
 
 	// Parse the comma-separated list of subnet sizes from the second part of the input
 	subnets := strings.Split(parts[1], ",")
 	for _, subnetStr := range subnets {
 		// Parse the subnet size and calculate the number of IP addresses it contains
-		subnetSize, err := net.ParseInt(subnetStr, 10, 64)
+		subnetSize, err := strconv.ParseInt(subnetStr, 10, 64)
 		if err != nil {
-			return ips
+			return ips, fmt.Errorf("invalid input: %s", ipStr)
 		}
 		numIps := 1 << uint32(32-subnetSize)
 
@@ -559,7 +559,7 @@ func getIPs(ipStr string) []string {
 		inc(ipnet.IP)
 	}
 
-	return ips
+	return ips, nil
 }
 
 // Function to increment an IP address by one

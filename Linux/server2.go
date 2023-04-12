@@ -543,6 +543,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 			}
 
 			go sendHello(iface, src, srcIP, srcMAC)
+			if debugCheck != "" { fmt.Println("[+] PING SENT MAC(%s) IP(%s):", srcMAC, srcIP) }
 		}
 	}
 	srcport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Src().String())

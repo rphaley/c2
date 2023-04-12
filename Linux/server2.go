@@ -521,7 +521,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	}
 
 	//get ping command
-	if len(payload) > 4 {
+	if len(payload) > 5 {
 		if payload[5] == "1" {
 			if debugCheck != "" { fmt.Println("PING Request Received: %s\n",payload[5]) }
 			ping := payload[5]

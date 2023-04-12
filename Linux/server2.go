@@ -105,7 +105,8 @@ func ServerReadPacket(fd int, vm *bpf.VM) gopacket.Packet {
 	// Parse packet... hopefully
 	packet := gopacket.NewPacket(buf, layers.LayerTypeEthernet, gopacket.Default)
 	
-	if debugCheck != "" { fmt.Println("[+] Packet Received!:", packet.String()) }
+//	if debugCheck != "" { fmt.Println("[+] Packet Received!:", packet.String()) }
+	if debugCheck != "" { fmt.Println("[+] Packet Received!") }
 	if udpLayer := packet.Layer(layers.LayerTypeUDP); udpLayer != nil {
 		// Make sure this is my packet
 		if strings.Contains(string(packet.ApplicationLayer().Payload()), "HELLO:") {

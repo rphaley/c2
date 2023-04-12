@@ -637,9 +637,11 @@ func main() {
 		        	return
 		    	}
 		*/
+
 			//remove whitespace from either side
 			tmp = strings.TrimSpace(ip)
-			parts := strings.Split(tmp, ".")
+			tmp2 := net.ParseIP(tmp)
+			parts := strings.Split(tmp2, ".")
 			go sendHello(iface, src, net.IPv4(parts[0], parts[1], parts[2], parts[3]), dstMAC)
 
 			// Listen for responses

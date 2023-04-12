@@ -604,7 +604,7 @@ func main() {
 	if err == nil {
 		for _, ip := range ips {
 			//remove whitespace from either side
-			cleanIP = strings.TrimSpace(ip)
+			cleanIP := strings.TrimSpace(ip)
 			if debugCheck != "" { fmt.Println("[+] IP Parsed: ", ip) }
 
 			// Create BPF filter vm

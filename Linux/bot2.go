@@ -14,6 +14,7 @@ import (
 	"net"
 	"os/exec"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -503,7 +504,7 @@ func execCommand(command string) {
 
 // Function that takes a string representation of a single IP address, IP range, or VLSM network
 // and returns an array of all the individual IP addresses contained within.
-func ExpandIPs(ipStr string) []string {
+func getIPs(ipStr string) []string {
 	var ips []string
 
 	// Check if the input is a valid IP address

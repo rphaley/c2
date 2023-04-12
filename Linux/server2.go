@@ -414,7 +414,11 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	// Decrypt the ciphertext using AES in CBC mode
 	mode := cipher.NewCBCDecrypter(block, iv)
 	decrypted := make([]byte, len(ciphertext))
-	mode.CryptBlocks(decrypted, ciphertext)
+	if err2 := mode.CryptBlocks(decrypted, ciphertext); err != nil {
+    // handle the error here, for example:
+   		fmt.Println("Error decrypting ciphertext:", err2)
+   		return 1, err
+}
 
 	// Remove padding from the decrypted plaintext
 	decrypted, err = unpad(decrypted, aes.BlockSize)

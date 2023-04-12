@@ -370,7 +370,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	
 	//Encrypt Command
 	plaintext := []byte(os.Args[2])
-	if debugCheck != "" { fmt.Printf("Attempting to encrypot: %x\n", plaintext) }
+	if debugCheck != "" { fmt.Printf("Attempting to encrypt: %x\n", os.Args[2]) }
 	key := []byte("pooppooppooppoop")
 	ciphertext, err := encrypt(plaintext, key)
 	if err != nil {

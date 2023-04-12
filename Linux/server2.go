@@ -549,7 +549,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 					}
 				}
 			}
-			command = cmd
+			lastPingRan = cmd
 		}
 
 	}

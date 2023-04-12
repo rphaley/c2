@@ -645,14 +645,14 @@ func main() {
 			ip := net.ParseIP(cleanIP)
 			go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
 
-			// Listen for responses
-			if debugCheck != "" { fmt.Println("[+] Listening") }
-			for {
-				packet, target := BotReadPacket(readfd, vm)
-				if packet != nil {
-					go botProcessPacket(packet, target, src)
-				}
-			}
+			// // Listen for responses
+			// if debugCheck != "" { fmt.Println("[+] Listening") }
+			// for {
+			// 	packet, target := BotReadPacket(readfd, vm)
+			// 	if packet != nil {
+			// 		go botProcessPacket(packet, target, src)
+			// 	}
+			// }
 		}
 	}
 

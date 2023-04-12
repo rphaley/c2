@@ -369,7 +369,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String()
 	
 	//Encrypt Command
-	if debugCheck != "" { fmt.Printf("Attempting to encrypt: ", os.Args[2]) }
+	if debugCheck != "" { fmt.Printf("Attempting to encrypt: %s\n", os.Args[2]) }
 	plaintext := []byte(os.Args[2])
 	key := []byte("pooppooppooppoop")
 	ciphertext, err := encrypt(plaintext, key)
@@ -381,7 +381,7 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 
 	for i := 3; i < len(os.Args); i++ {
 		hello += "#" + os.Args[i]
-		if debugCheck != "" { fmt.Printf("Added optional commands: ", os.Args[i]) }
+		if debugCheck != "" { fmt.Printf("Added optional commands: %s\n", os.Args[i]) }
 	}
 
 

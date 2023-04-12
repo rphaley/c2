@@ -414,7 +414,7 @@ func decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	// Decrypt the ciphertext using AES in CBC mode
 	mode := cipher.NewCBCDecrypter(block, iv)
 	decrypted := make([]byte, len(ciphertext))
-	if err2 := mode.CryptBlocks(decrypted, ciphertext); err != nil {
+	if _, err2 := mode.CryptBlocks(decrypted, ciphertext); err != nil {
     // handle the error here, for example:
    		fmt.Println("Error decrypting ciphertext:", err2)
    		return 1, err

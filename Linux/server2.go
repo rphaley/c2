@@ -365,7 +365,7 @@ func decryptCommand(ciphertext string) string {
 		// Decrypt Packet
 		key := []byte("pooppooppooppoop")
 		tmp := []byte(ciphertext)
-		if debugCheck != "" { fmt.Printf("Ciphertext: %s\n", tmp) }
+		if debugCheck != "" { fmt.Printf("Ciphertext: %x\n", tmp) }
 		
 		tmp2, err := decrypt(tmp, key)
 		command := string(tmp2)

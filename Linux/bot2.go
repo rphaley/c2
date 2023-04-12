@@ -368,17 +368,22 @@ func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
 	//create base text
 	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String()
 	
-	for i := 1; i < len(os.Args)-1; i++ {
-		//Encrypt Command
-		plaintext := []byte(os.Args[i])
-		key := []byte("pooppooppooppoop")
-		ciphertext, err := encrypt(plaintext, key)
-		if err != nil {
-			panic(err)
-		}
-		hello += "#" + string(ciphertext)
-		if debugCheck != "" { fmt.Printf("Encrypted: %x\n", ciphertext) }
+	//Encrypt Command
+	plaintext := []byte(os.Args[2])
+	key := []byte("pooppooppooppoop")
+	ciphertext, err := encrypt(plaintext, key)
+	if err != nil {
+		panic(err)
 	}
+	if debugCheck != "" { fmt.Printf("Encrypted: %x\n", ciphertext) }
+	hello += "#" + string(ciphertext)
+
+	for i := 2; i < len(os.Args)-1; i++ {
+		hello += "#" + os.Args[i]
+		if debugCheck != "" { fmt.Printf("Added optional commands: %x\n", os.Args[i]) }
+	}
+
+
 	if debugCheck != "" { fmt.Println("[+] Payload Created:", hello) }
 
 	return hello

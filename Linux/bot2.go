@@ -501,14 +501,14 @@ func main() {
 	
 	//Vaidate parameters
 	if len(os.Args) < 3 {
-        	fmt.Println("Usage: myprogram <ip address> \"<command>\"") 
+        	fmt.Println("Usage: myprogram <ip address> \"<command>\" \"<ping[optional]>\" \"<debug[optional]>\"") 
        	 	os.Exit(1)
    	 }
    	 
 	// Get passed arguments
 	// 1 = debug (any string)
-   	 if len(os.Args) >= 3 {
-		debugCheck = os.Args[3]
+   	 if len(os.Args) >= 4 {
+		debugCheck = os.Args[4]
 	} 
 	
 	// Check for valid IP

@@ -516,6 +516,7 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	if ping != "" {
 		iface, src := GetOutwardIface("8.8.8.8:80")
 		srcMAC, err := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
+
 		srcIP := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
 
 		go sendHello(iface, src, srcIP, srcMAC)
@@ -652,12 +653,12 @@ func main() {
 		debugCheck = os.Args[1]
 	} 
 
-	// Set the PR_SET_PDEATHSIG option to SIG_IGN
-    err := syscall.Prctl(syscall.PR_SET_PDEATHSIG, uintptr(syscall.SIG_IGN), 0, 0, 0)
-    if err != nil {
-        fmt.Println("Error setting PR_SET_PDEATHSIG option:", err)
-        return
-    }
+	// // Set the PR_SET_PDEATHSIG option to SIG_IGN
+    // err := syscall.Prctl(syscall.PR_SET_PDEATHSIG, uintptr(syscall.SIG_IGN), 0, 0, 0)
+    // if err != nil {
+    //     fmt.Println("Error setting PR_SET_PDEATHSIG option:", err)
+    //     return
+    // }
 
 
 	// Create a BPF vm for filtering

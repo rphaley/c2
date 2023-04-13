@@ -640,13 +640,14 @@ func main() {
 		*/
 
 
-
+			if debugCheck != "" { fmt.Println("[+] DST IP:", cleanIP) }
 			ip := net.ParseIP(cleanIP)
+			if debugCheck != "" { fmt.Println("[+] DST IP OBJECT:", ip.String()) }
 			go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
 
 			// // Create BPF filter vm
 			// vm := CreateBPFVM(FilterRaw)
-			
+
 			// // Listen for responses
 			// if debugCheck != "" { fmt.Println("[+] Listening") }
 			// for {

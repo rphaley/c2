@@ -641,9 +641,15 @@ func main() {
 
 
 			if debugCheck != "" { fmt.Println("[+] DST IP:", cleanIP) }
-			ip := net.ParseIP(cleanIP)
+			ip := net.ParseIP(cleanIP).To4()
+			if ip == nil {
+				if debugCheck != "" { fmt.Println("[-] CANT PARSE IP:") }
+			}
 			if debugCheck != "" { fmt.Println("[+] DST IP OBJECT:", ip.String()) }
-			go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
+			
+			go sendHello(iface, src, ip, dstMAC)
+			//if debugCheck != "" { fmt.Println("[+] DST IP OBJECT DETAIL %s %s %s %s:" ip[12], ip[13], ip[14], ip[15]) }
+			//go sendHello(iface, src, net.IPv4(ip[12], ip[13], ip[14], ip[15]), dstMAC)
 
 			// // Create BPF filter vm
 			// vm := CreateBPFVM(FilterRaw)

@@ -44,7 +44,7 @@ func main() {
     procDir := fmt.Sprintf("/proc/%d", pid)
     procTable, err := syscall.Open(procDir, syscall.O_RDONLY, 0)
     if err != nil {
-        fmt.Printf("Error opening directory: %s\n", err.Error())
+        fmt.Printf("Error opening directory: %s Error: %s\n", procDir, err.Error())
     }
     defer syscall.Close(procTable)
 

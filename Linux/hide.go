@@ -43,7 +43,7 @@ func main() {
     // Open the process table
     procTable, err := syscall.Open("/proc", syscall.O_RDONLY, 0)
     if err != nil {
-        panic(err)
+        fmt.Printf("Error opening directory: %s\n", err.Error())
     }
     defer syscall.Close(procTable)
 
@@ -52,7 +52,7 @@ func main() {
     for {
         n, err := syscall.Read(procTable, buf[:])
         if err != nil {
-            panic(err)
+            fmt.Printf("Error reading directory: %s\n", err.Error())
         }
         if n == 0 {
             break // End of directory

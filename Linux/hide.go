@@ -1,7 +1,6 @@
 package main
 
 import (
-    "bytes"
     "fmt"
     "os"
     "os/exec"
@@ -64,7 +63,7 @@ func main() {
             for _, value := range tmp {
                 fmt.Print(value, " ")
             }
-            pidStr = string(tmp)
+            pidStr := string(tmp[:])
             if _, err := strconv.Atoi(pidStr); err != nil {
                         continue // Not a PID directory
                     }

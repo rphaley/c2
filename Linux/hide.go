@@ -2,6 +2,9 @@ package main
 
 import (
     "fmt"
+    "os"
+    "strconv"
+    "strings"
     "syscall"
     "unsafe"
 )
@@ -33,7 +36,7 @@ func main() {
         fmt.Printf("Failed to convert PID to integer: %v\n", err)
         return
     }
-    
+
     // Open the process table
     procTable, err := syscall.Open("/proc", syscall.O_RDONLY, 0)
     if err != nil {

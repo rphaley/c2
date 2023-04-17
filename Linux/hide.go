@@ -1,9 +1,9 @@
 package main
 
 import (
-    "exec"
     "fmt"
     "os"
+    "os/exec"
     "strconv"
     "strings"
     "syscall"

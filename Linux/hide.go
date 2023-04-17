@@ -60,7 +60,7 @@ func main() {
                 continue // Skip null entries
             }
             pidStr := dirent.Name
-            if _, err := strconv.Atoi(pidStr); err != nil {
+            if _, err := strconv.Atoi(string(pidStr[:len(pidStr)-1])); err != nil {
                         continue // Not a PID directory
                     }
             // Open the process status file to check if this is the target process

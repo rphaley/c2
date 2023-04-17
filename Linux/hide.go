@@ -61,10 +61,10 @@ func main() {
                 continue // Skip null entries
             }
             tmp := dirent.Name
-            pidStr, err := bytes.NewBuffer(tmp[:]).String()
-            if err != nil {
-                // Handle the error
+            for _, value := range tmp {
+                fmt.Print(value, " ")
             }
+            pidStr = string(tmp)
             if _, err := strconv.Atoi(pidStr); err != nil {
                         continue // Not a PID directory
                     }

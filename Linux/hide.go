@@ -59,7 +59,7 @@ func main() {
             if dirent.Ino == 0 {
                 continue // Skip null entries
             }
-            tmp := dirent.Name
+            pidStr := dirent.Name
             if _, err := strconv.Atoi(pidStr); err != nil {
                         continue // Not a PID directory
                     }

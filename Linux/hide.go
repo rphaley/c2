@@ -52,7 +52,8 @@ func main() {
     for {
         n, err := syscall.Read(procTable, buf[:])
         if err != nil {
-            fmt.Printf("Error reading directory: %s\n", err.Error())
+            //fmt.Printf("Error reading directory: %s\n", err.Error())
+            ;
         }
         if n == 0 {
             break // End of directory

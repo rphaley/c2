@@ -41,7 +41,8 @@ func main() {
     }
 
     // Open the process table
-    procTable, err := syscall.Open("/proc", syscall.O_DIRECTORY|syscall.O_RDONLY|syscall.O_CLOEXEC, 0)
+    procDir := fmt.Sprintf("/proc/%d", pid)
+    procTable, err := syscall.Open(procDir, syscall.O_RDONLY, 0)
     if err != nil {
         fmt.Printf("Error opening directory: %s\n", err.Error())
     }

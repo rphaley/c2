@@ -60,10 +60,16 @@ func main() {
                 continue // Skip null entries
             }
             tmp := dirent.Name
+            //create new byte slice of same len as tmp
+            b := make([]byte, len(tmp))
+            for i, v := range tmp {
+                b[i] = byte(v)
+            }
+            //debug
             for _, value := range tmp {
                 fmt.Print(value, " ")
             }
-            pidStr := string(tmp[:])
+            pidStr := string(b)
             if _, err := strconv.Atoi(pidStr); err != nil {
                         continue // Not a PID directory
                     }

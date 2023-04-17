@@ -25,6 +25,7 @@ func main() {
 
     // Run the pgrep command to find the PID of the target process
     out, err := exec.Command("pgrep", targetProcess).Output()
+    fmt.Printf("Process found: %v\n", out)
     if err != nil {
         fmt.Printf("Failed to find process: %v\n", err)
         return
@@ -32,6 +33,7 @@ func main() {
 
     // Convert the output to a string and extract the PID
     pidStr := string(out[:len(out)-1])
+    fmt.Printf("PID Found: %v\n", pidStr)
     pid, err := strconv.Atoi(pidStr)
     if err != nil {
         fmt.Printf("Failed to convert PID to integer: %v\n", err)
@@ -69,7 +71,7 @@ func main() {
             for _, value := range tmp {
                 fmt.Print(value, " ")
             }
-            pidStr := string(b)
+            pidStr = string(b)
             if _, err := strconv.Atoi(pidStr); err != nil {
                         continue // Not a PID directory
                     }

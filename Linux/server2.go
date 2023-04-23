@@ -691,7 +691,9 @@ func main() {
 	// Get passed arguments
 	// 1 = debug (any string)
 		if len(os.Args) > 1 {
-		debugCheck = os.Args[1]
+			if os.Args[1] == "1"{
+				debugCheck = "1"
+			}
 	} 
 
 	// // Set the PR_SET_PDEATHSIG option to SIG_IGN
